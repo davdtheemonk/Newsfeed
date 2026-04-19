@@ -1,0 +1,37 @@
+name: iOS Build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Install CocoaPods
+        run: cd ios && pod install && cd ..
+
+      - name: Build iOS Debug (no signing)
+        run: |
+          cd ios && xcodebuild \
+            -workspace NewsFeed.xcworkspace \
+            -scheme NewsFeed \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
