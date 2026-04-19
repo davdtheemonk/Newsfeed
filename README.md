@@ -128,7 +128,6 @@ All selectors that derive new array references — `selectSortedArticles` and `s
 ### Known Trade-offs
 
 - `getItemLayout` assumes a fixed card height. If cards vary in height (e.g. very long titles), the scroll position calculation will be slightly off. The correct fix is dynamic measurement with `onLayout` per item.
-- The offline banner uses `Animated` and `PanResponder` from core React Native rather than Reanimated, which had compatibility issues with RN 0.85. Reanimated would give smoother 60fps animations on the UI thread.
 - Bookmark persistence writes on every toggle. In a high-frequency write scenario, debouncing the save would reduce I/O.
 
 ---
