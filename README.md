@@ -97,7 +97,7 @@ npx react-native run-ios
 ### Bonus Features I implemented
 
 - [x] Bookmarks tab with swipe-to-remove
-- [x] Debounced search on Screen 1 — client-side filtering, no additional API calls
+- [x] Debounced search on Screen 1
 - [x] Offline detection banner with slide animation
 
 ## Architecture Decisions
