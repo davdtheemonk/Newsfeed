@@ -4,7 +4,7 @@ A React Native news feed application built with TypeScript, Redux Toolkit, and R
 
 ---
 
-## Screenshots
+## Screens
 
 | Feed                            | Detail                               | Bookmarks                          |
 | ------------------------------- | ------------------------------------ | ---------------------------------- |
@@ -70,8 +70,6 @@ npx react-native run-android
 ```bash
 npx react-native run-ios
 ```
-
-## Project Structure
 
 ## Features
 
