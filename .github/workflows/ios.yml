@@ -1,38 +1,41 @@
-# .github/workflows/ios.yml
-name: iOS Build
+name: iOS 14 Compatibility Test
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build:
-    runs-on: macos-latest
+  test-ios14:
+    runs-on: macos-14 # Use macOS 14 runner
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: true
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Install JS dependencies
-        run: npm install
-
-      - name: Install CocoaPods
-        run: cd ios && pod install && cd ..
-
-      - name: Build iOS Debug (no signing)
+      - name: Install iOS 14 Simulator
         run: |
-          cd ios && xcodebuild \
+          # List available runtimes first
+          xcrun simctl runtime list
+          # Install iOS 14.5 simulator runtime (last iOS 14 version)
+          xcodebuild -downloadPlatform iOS -version 14.5 || true
+
+      - name: Build for iOS 14 Simulator
+        run: |
+          cd ios
+          pod install
+          xcodebuild build \
             -workspace NewsFeed.xcworkspace \
             -scheme NewsFeed \
-            -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO \
-            build
+            -destination 'platform=iOS Simulator,OS=14.5,name=iPhone 12' \
+            CODE_SIGNING_ALLOWED=NO
