@@ -79,7 +79,7 @@ npx react-native run-ios
 
 ### State Management — Redux Toolkit
 
-I chose Redux Toolkit over Zustand for three reasons. First, `createAsyncThunk` provides a clean standardised pattern for the fetch lifecycle — `pending / fulfilled / rejected` — that maps directly onto the three required UI states. Second, sort toggle and bookmark state need to survive navigation, and RTK's single global store makes cross-screen state sharing explicit and traceable without prop-drilling. Third, typed `useAppDispatch` and `useAppSelector` wrappers enforce TypeScript correctness at every callsite.
+I chose Redux Toolkit over Zustand for three reasons. First, `createAsyncThunk` provides a clean standardised pattern for the fetch lifecycle(`pending / fulfilled / rejected`), that maps directly onto the three required UI states. Second, sort toggle and bookmark state need to survive navigation, and RTK's single global store makes cross-screen state sharing explicit and traceable without prop-drilling. Third, typed `useAppDispatch` and `useAppSelector` wrappers enforce TypeScript correctness at every callsite.
 
 The trade-off is boilerplate. Zustand would be leaner for simpler state needs. The deciding factor here was `createAsyncThunk` and the structured async lifecycle it provides.
 
