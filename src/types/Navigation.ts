@@ -6,6 +6,11 @@ export type RootStackParamList = {
 };
 
 export type TabParamList = {
-  Feed: undefined;
+  Feed:
+    | {
+        screen: keyof RootStackParamList;
+        params?: { article?: Article };
+      }
+    | undefined;
   Bookmarks: undefined;
 };

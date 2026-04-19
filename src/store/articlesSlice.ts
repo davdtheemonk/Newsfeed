@@ -1,4 +1,9 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAsyncThunk,
+  PayloadAction,
+  createSelector,
+} from '@reduxjs/toolkit';
 import type { RootState } from '.';
 import type { Article, SortBy } from '../types/Article';
 import { fetchTopStories } from '../utils/api';
@@ -57,10 +62,13 @@ const articlesSlice = createSlice({
 export const { setSortBy } = articlesSlice.actions;
 export default articlesSlice.reducer;
 
+const selectArticles = (state: RootState) => state.articles.articles;
+const selectSortBy = (state: RootState) => state.articles.sortBy;
 // Memoised selector — returns sorted copy, never mutates state
-export function selectSortedArticles(state: RootState): Article[] {
-  const { articles, sortBy } = state.articles;
-  return [...articles].sort((a, b) =>
-    sortBy === 'score' ? b.score - a.score : b.time - a.time,
-  );
-}
+export const selectSortedArticles = createSelector(
+  [selectArticles, selectSortBy],
+  (articles, sortBy) =>
+    [...articles].sort((a, b) =>
+      sortBy === 'score' ? b.score - a.score : b.time - a.time,
+    ),
+);

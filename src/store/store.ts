@@ -8,6 +8,12 @@ export const store = configureStore({
     articles: articlesReducer,
     bookmarks: bookmarksReducer,
   },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        warnAfter: 100,
+      },
+    }),
 });
 
 // Rehydrate bookmarks from AsyncStorage on startup

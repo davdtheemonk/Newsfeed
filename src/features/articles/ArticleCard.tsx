@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+// src/features/articles/ArticleCard.tsx
+import React, { memo, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import type { Article } from '../../types/Article';
 import { parseDomain } from '../../utils/domain';
@@ -11,7 +12,48 @@ interface Props {
 
 const FAVICON_BASE = 'https://www.google.com/s2/favicons?sz=64&domain=';
 
-// Wrapped in React.memo — prevents re-renders when sibling list items change
+function getDomainColor(domain: string): string {
+  const colors = [
+    '#E65100',
+    '#1565C0',
+    '#2E7D32',
+    '#6A1B9A',
+    '#AD1457',
+    '#00695C',
+    '#4527A0',
+    '#C62828',
+  ];
+  const index = domain.charCodeAt(0) % colors.length;
+  return colors[index];
+}
+
+interface FaviconProps {
+  domain: string;
+}
+
+function Favicon({ domain }: FaviconProps) {
+  const [failed, setFailed] = useState(false);
+  const color = getDomainColor(domain);
+  const letter = domain.charAt(0).toUpperCase();
+
+  if (failed) {
+    // Custom placeholder
+    return (
+      <View style={[styles.faviconPlaceholder, { backgroundColor: color }]}>
+        <Text style={styles.faviconLetter}>{letter}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      source={{ uri: `${FAVICON_BASE}${domain}` }}
+      style={styles.favicon}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 const ArticleCard = memo(({ article, onPress }: Props) => {
   const domain = parseDomain(article.url);
 
@@ -24,10 +66,7 @@ const ArticleCard = memo(({ article, onPress }: Props) => {
       accessibilityLabel={article.title}
     >
       <View style={styles.row}>
-        <Image
-          source={{ uri: `${FAVICON_BASE}${domain}` }}
-          style={styles.favicon}
-        />
+        <Favicon domain={domain} />
         <View style={styles.meta}>
           <Text style={styles.domain} numberOfLines={1}>
             {domain}
@@ -67,35 +106,34 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   favicon: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 6,
     marginRight: 8,
   },
-  meta: {
-    flex: 1,
+  faviconPlaceholder: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  domain: {
-    fontSize: 12,
-    color: '#888',
-    fontWeight: '500',
-  },
-  time: {
+  faviconLetter: {
     fontSize: 11,
-    color: '#aaa',
-    marginTop: 1,
+    fontWeight: '700',
+    color: '#fff',
   },
+  meta: { flex: 1 },
+  domain: { fontSize: 12, color: '#888', fontWeight: '500' },
+  time: { fontSize: 11, color: '#aaa', marginTop: 1 },
   scorePill: {
     backgroundColor: '#FFF3E0',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  scoreText: {
-    fontSize: 12,
-    color: '#E65100',
-    fontWeight: '600',
-  },
+  scoreText: { fontSize: 12, color: '#E65100', fontWeight: '600' },
   title: {
     fontSize: 15,
     fontWeight: '600',

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '.';
 
 interface BookmarksState {
@@ -35,15 +35,12 @@ export const { addBookmark, removeBookmark, setBookmarks } =
 export default bookmarksSlice.reducer;
 
 // Curried selector — use as: selectIsBookmarked(id)(state)
-export const selectIsBookmarked =
-  (id: number) =>
-  (state: RootState): boolean =>
-    state.bookmarks.bookmarkedIds.includes(id);
+export const selectIsBookmarked = (id: number) =>
+  createSelector([selectBookmarkedIds], ids => ids.includes(id));
+const selectBookmarkedIds = (state: RootState) => state.bookmarks.bookmarkedIds;
+const selectArticles = (state: RootState) => state.articles.articles;
 
-export const selectBookmarkedIds = (state: RootState) =>
-  state.bookmarks.bookmarkedIds;
-
-export const selectAllBookmarkedArticles = (state: RootState) => {
-  const ids = state.bookmarks.bookmarkedIds;
-  return state.articles.articles.filter(a => ids.includes(a.id));
-};
+export const selectAllBookmarkedArticles = createSelector(
+  [selectBookmarkedIds, selectArticles],
+  (ids, articles) => articles.filter(article => ids.includes(article.id)),
+);
