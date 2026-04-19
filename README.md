@@ -186,7 +186,7 @@ The caching strategy depends on your data. For a news feed that changes often bu
 
 For cache invalidation, I keep it simple. Feed data gets a five minute fresh window, but offline it remains usable indefinitely. For user generated data like bookmarks, I invalidate immediately on any write action.
 
-The main tension is giving users the latest info versus giving them any info at all. Serving stale cached data keeps the app functional offline but risks showing outdated content. The mitigation is clear UI affordances, like a last updated timestamp and an offline banner, so users always know the data freshness without being blocked from using the app.
+The main tension is giving users the latest info versus giving them any info at all. Serving stale cached data keeps the app functional offline but risks showing outdated content. The fix is simple, make it obvious in the UI, like a last updated timestamp and an offline banner, so users always know the data freshness without being blocked from using the app.
 
 ---
 
