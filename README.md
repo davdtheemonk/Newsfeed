@@ -36,7 +36,7 @@ A React Native news feed application built with TypeScript, Redux Toolkit, and R
 - Node.js 22+
 - JDK 17+
 - Android Studio with an emulator (API 30+) or a physical device
-- For iOS: macOS with Xcode 15+ (see iOS note below)
+- For iOS: macOS with Xcode 15+
 
 ### Installation
 
