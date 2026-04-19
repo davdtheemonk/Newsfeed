@@ -110,7 +110,7 @@ MMKV would be the better choice in a production app, it is synchronous, signific
 
 ### Selectors — createSelector
 
-All selectors that derive new array references — `selectSortedArticles` and `selectAllBookmarkedArticles` — are wrapped in `createSelector` from Redux Toolkit. This memoises the result and only recomputes when the input selectors return new references, preventing unnecessary re-renders when unrelated state changes.
+All selectors that derive new array references ,`selectSortedArticles` and `selectAllBookmarkedArticles`, are wrapped in `createSelector` from Redux Toolkit. This memoises the result and only recomputes when the input selectors return new references, preventing unnecessary re-renders when unrelated state changes.
 
 ### Performance
 
