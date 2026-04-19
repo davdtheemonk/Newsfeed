@@ -165,59 +165,55 @@ Fetches the first 20 IDs then retrieves each item in parallel via `Promise.all`.
 
 ### Q1 — Bridge vs JSI & The New Architecture
 
-The old Bridge worked like a translator between JavaScript and native code, but it was slow. Every time JS needed something from native, the request had to be turned into a JSON string, sent across the bridge, unpacked on the native side, then the response had to be turned back into JSON and sent again. That meant you couldn’t access native things synchronously, and the delay was especially noticeable during gestures or animations where every frame counts.
+The old Bridge worked like a translator between JavaScript and native code, but it was slow. Every request had to be serialized to JSON, sent across, unpacked on the native side, and then the response had to be serialized and sent back. That meant you couldn't access native things synchronously, and the delay was especially noticeable during gestures or animations.
 
-JSI changes that completely. Instead of passing messages back and forth, it gives the JavaScript engine a direct C++ reference to native objects. So when JS calls a native method, it happens right away, no serialization, no waiting. The JS thread actually holds a pointer to a real native object, which cuts out the whole JSON round-trip.
+JSI changes that completely by giving the JavaScript engine a direct C++ reference to native objects. When JS calls a native method, it happens right away with no serialization and no waiting. The JS thread holds an actual pointer to a native object, cutting out the entire JSON round trip.
 
-The New Architecture builds on top of JSI with two main pieces.
-Fabric is the new rendering system, it moves layout work off the main thread and lets the renderer read native view state synchronously. That means things like useNativeDriver can work everywhere, and you don’t drop frames waiting for the Bridge.
-TurboModules replace the old NativeModules system. Instead of loading every native module when the app starts up, TurboModules load lazily via JSI. That speeds up startup time significantly.
-
-Together, they remove the Bridge entirely. Native and JavaScript communication starts to feel just like a regular function call.
+The New Architecture builds on JSI with two main pieces. Fabric is the new rendering system that moves layout work off the main thread, so useNativeDriver works everywhere without frame drops. TurboModules replace the old NativeModules system by loading lazily via JSI instead of eagerly at startup, which significantly speeds up app launch. Together, they remove the Bridge entirely, making native to JS communication feel just like a regular function call.
 
 ---
 
 ### Q2 — Diagnosing a Janky FlatList
 
-I'd open up Flipper or Android Studio's CPU profiler with React Native tracing turned on, scroll through the list, and see whether the frame drops are happening on the JS thread or the UI thread. Spikes on the JS thread usually mean render logic issues; spikes on the UI thread point to native layout problems or overdraw.
+I'd open Flipper or Android Studio's CPU profiler with React Native tracing on, scroll through the list, and see whether frame drops are happening on the JS thread or the UI thread. Spikes on the JS thread usually mean render logic issues, while spikes on the UI thread point to native layout problems or overdraw.
 
-Next, I'd check for two missing things: keyExtractor and getItemLayout. Without keyExtractor, React falls back to matching items by index, so any reordering triggers full re-renders. And without getItemLayout, the FlatList can't pre-calculate where each item goes, so it has to measure every single item when the list mounts, which causes a ton of layout thrashing. Both are quick fixes with no downsides.
+Next, I'd check for two missing things: keyExtractor and getItemLayout. Without keyExtractor, React falls back to matching items by index, so any reordering triggers full re-renders. Without getItemLayout, the FlatList can't precalculate item positions and has to measure every item on mount, causing layout thrashing.
 
-Then I'd look at the renderItem function. If it's written inline, like renderItem={({ item }) => <Card />} that creates a brand new function reference every time the parent re-renders, which completely breaks React.memo on the item component. Pulling it out with useCallback and wrapping the item component in React.memo solves that.
+Then I'd look at the renderItem function. If it's written inline like renderItem={({ item }) => <Card />}, that creates a new function reference on every parent render, which breaks React.memo on the item component. Pulling it out with useCallback and wrapping the item component in React.memo solves that.
 
-Finally, I'd check how images are loading. Unoptimized image can really hammer the GPU on mid-range Android phones. Switching to FastImage, setting explicit width and height, and using resizeMode="cover" usually clears that up. If frames are still dropping after that, I'd tweak maxToRenderPerBatch, windowSize, and turn on removeClippedSubviews.
+Finally, I'd check image loading, because unoptimized images can hammer the GPU on mid-range Android phones. Switching to FastImage, setting explicit dimensions, and using resizeMode="cover" usually clears it up. If frames are still dropping, I'd tweak maxToRenderPerBatch, windowSize, and enable removeClippedSubviews.
 
 ---
 
 ### Q3 — useCallback and useMemo
 
-Let me give you a real example where useCallback actually makes a measurable difference. Imagine a FlatList with over 180 items. If your renderItem creates a new function reference every time the parent component re renders, you run into trouble. Every state change in the parent, like toggling a sort order or updating a search query, causes every single list item wrapped in React.memo to re render anyway. Why? Because the onPress prop keeps changing to a brand new function, even though the behavior is identical. Wrapping both renderItem and that onPress in useCallback locks down the reference, so React.memo can finally do its job. The result is dramatic. Re renders drop from re rendering all 180 items down to just the one that actually changed.
+Let me give you a real example where useCallback actually makes a measurable difference. Imagine a FlatList with 180 items where renderItem creates a new function reference on every parent render. Every state change in the parent, like toggling sort order or updating a search query, causes every list item wrapped in React.memo to re render anyway because the onPress prop keeps changing to a brand new function. Wrapping both renderItem and onPress in useCallback locks down the reference, so React.memo can finally do its job. The result is dramatic, dropping re renders from all 180 items down to just the one that actually changed.
 
-Now here is where useMemo can actually make performance worse. Take a trivial computation like this: const label = useMemo(() => user.firstName + ' ' + user.lastName, [user]). You are just concatenating two strings. But useMemo is not free. It has to allocate an array for the dependencies, compare references on every render, and store the cached result. All of that overhead often costs more than just running the original operation inline. So in cases like this, useMemo actually slows things down instead of speeding them up.
+Now here is where useMemo can actually make performance worse. Take a trivial computation like const label = useMemo(() => user.firstName + ' ' + user.lastName, [user]). You are just concatenating two strings, but useMemo has to allocate a dependency array, compare references on every render, and store the cached result. That overhead often costs more than just running the original operation inline.
 
-useMemo only pays for itself in two situations. One, when the wrapped computation is genuinely expensive, like heavy math, sorting large arrays, or complex data transformations. Two, when you need referential stability of the returned object for a downstream component wrapped in memo. Applying useMemo indiscriminately to cheap operations is a great way to slow your app down without even realizing it.
+useMemo only pays for itself in two situations. First, when the wrapped computation is genuinely expensive, like heavy math, sorting large arrays, or complex data transformations. Second, when you need referential stability of the returned object for a downstream component wrapped in memo. Applying useMemo indiscriminately to cheap operations is a great way to slow your app down without realizing it.
 
 ---
 
 ### Q4 — State Management Decision
 
-Context API is fine for global state that doesn't change often. Think things like theme, locale, or whether a user is logged in. Updates are rare and not that many components need to listen in. The big catch is that every single context consumer re renders whenever anything in the context changes, even if that component only uses one tiny field. So for an app with twelve screens and a handful of API integrations, this becomes a real performance problem fast. And on top of that, Context doesn't give you anything for async data fetching or handling loading and error states. You're on your own there.
+Context API is fine for global state that doesn't change often, like theme, locale, or login status. The big catch is that every context consumer re renders whenever anything in the context changes, even if that component only uses one tiny field. For an app with twelve screens and several API integrations, this becomes a real performance problem fast. On top of that, Context gives you nothing for async data fetching or handling loading and error states.
 
-Redux Toolkit fixes the performance issue with selectors. Components subscribe to exactly the piece of state they care about, so they only re render when that specific data actually changes. createAsyncThunk gives you a clean, standard way to handle async flows with built in pending, fulfilled, and rejected states. The downside is the boilerplate. You have slices, selectors, typed hooks. It adds setup time, but in a large codebase that investment really pays off.
+Redux Toolkit fixes the performance issue with selectors, so components only re render when their specific piece of state actually changes. createAsyncThunk gives you a clean way to handle async flows with built in pending, fulfilled, and rejected states. The downside is the boilerplate, including slices, selectors, and typed hooks, but in a large codebase that investment pays off.
 
-Zustand lands somewhere in the middle. The API is way leaner than Redux Toolkit. No Provider to wrap your whole app, almost no boilerplate, but you still get selector based subscriptions. For this project I went with Redux Toolkit because createAsyncThunk made the three state fetch lifecycle really simple to implement and test. If the app had fewer async network requests, Zustand would have been the better choice. You get what you need without all the extra wiring
+Zustand lands somewhere in the middle with a much leaner API and no Provider wrapper, while still supporting selector based subscriptions. For this project I chose Redux Toolkit because createAsyncThunk made the three state fetch lifecycle simple to implement and test. If the app had fewer async network requests, Zustand would have been the better choice since you get what you need without all the extra wiring.
 
 ---
 
 ### Q5 — Offline-First UX Strategy
 
-Detecting connectivity is your first line of defense. I use @react-native-community/netinfo with a little useNetInfo hook that just tells me isConnected. That drives an OfflineBanner component I stick at the navigator level so it shows up everywhere without me having to wire it into each screen individually.
+Detecting connectivity is your first line of defense. I use @react-native-community/netinfo with a small hook that tells me isConnected, which drives an OfflineBanner component at the navigator level so it shows up everywhere without per screen wiring.
 
-The caching strategy really depends on what kind of data you're dealing with. Take a news feed. It changes often, but even stale content is better than a blank screen. For that, I would cache the last successful API response in AsyncStorage, keyed by the endpoint. When the screen loads, it shows the cached data instantly while quietly fetching fresh stuff in the background. If the fetch works, the cache updates. If you are offline, the user still sees something, just with a little timestamp letting them know when it was last refreshed.
+The caching strategy depends on your data. For a news feed that changes often but where stale content is better than a blank screen, I cache the last successful API response in AsyncStorage keyed by endpoint. When the screen loads, it shows cached data instantly while quietly fetching fresh data in the background. If you are offline, the user still sees something, just with a timestamp letting them know when it was last refreshed.
 
-For cache invalidation, I keep it simple. Feed data gets a five minute "fresh" window, but offline it is considered stale but usable indefinitely. For user generated stuff like bookmarks, I invalidate immediately on any write action. No waiting around.
+For cache invalidation, I keep it simple. Feed data gets a five minute fresh window, but offline it remains usable indefinitely. For user generated data like bookmarks, I invalidate immediately on any write action.
 
-The core trade-off is consistency versus availability. Serving stale cached data keeps the app functional offline but risks showing outdated content. The mitigation is showing it clearly in the UI, one can use last-updated timestamp and an offline banner so users always know the data freshness without being blocked from using the app.
+The main tension is giving users the latest info versus giving them any info at all. Serving stale cached data keeps the app functional offline but risks showing outdated content. The mitigation is clear UI affordances, like a last updated timestamp and an offline banner, so users always know the data freshness without being blocked from using the app.
 
 ---
 
