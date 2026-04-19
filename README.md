@@ -192,5 +192,5 @@ The main tension is giving users the latest info versus giving them any info at 
 
 ## What I Would Do Differently
 
-- Implement **react-query** or **RTK Query** for the API layer — built-in caching, background refetch, and stale-while-revalidate out of the box
-- Add **pagination** — currently fetches only the first 20 stories; a real feed would paginate as the user scrolls
+- Implement RTK Query for the API layer. RTK Qeury has built-in caching, background refetch, and stale-while-revalidate out of the box.
+- Add pagination, currently the app fetches only the first 20 stories, a real feed would paginate as the user scrolls.
