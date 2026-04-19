@@ -167,11 +167,11 @@ Fetches the first 20 IDs then retrieves each item in parallel via `Promise.all`.
 
 The old Bridge worked like a translator between JavaScript and native code, but it was slow. Every time JS needed something from native, the request had to be turned into a JSON string, sent across the bridge, unpacked on the native side, then the response had to be turned back into JSON and sent again. That meant you couldn’t access native things synchronously, and the delay was especially noticeable during gestures or animations where every frame counts.
 
-JSI changes that completely. Instead of passing messages back and forth, it gives the JavaScript engine a direct C++ reference to native objects. So when JS calls a native method, it happens right away—no serialization, no waiting. The JS thread actually holds a pointer to a real native object, which cuts out the whole JSON round-trip.
+JSI changes that completely. Instead of passing messages back and forth, it gives the JavaScript engine a direct C++ reference to native objects. So when JS calls a native method, it happens right away, no serialization, no waiting. The JS thread actually holds a pointer to a real native object, which cuts out the whole JSON round-trip.
 
 The New Architecture builds on top of JSI with two main pieces.
-Fabric is the new rendering system—it moves layout work off the main thread and lets the renderer read native view state synchronously. That means things like useNativeDriver can work everywhere, and you don’t drop frames waiting for the Bridge.
-TurboModules replace the old NativeModules system. Instead of loading every native module when the app starts up, TurboModules load lazily via JSI—only when you actually call them. That speeds up startup time significantly.
+Fabric is the new rendering system, it moves layout work off the main thread and lets the renderer read native view state synchronously. That means things like useNativeDriver can work everywhere, and you don’t drop frames waiting for the Bridge.
+TurboModules replace the old NativeModules system. Instead of loading every native module when the app starts up, TurboModules load lazily via JSI. That speeds up startup time significantly.
 
 Together, they remove the Bridge entirely. Native and JavaScript communication starts to feel just like a regular function call.
 
