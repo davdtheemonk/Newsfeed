@@ -16,7 +16,7 @@ function ArticleStack() {
       <Stack.Screen
         name="ArticleList"
         component={ArticleListScreen}
-        options={{ title: 'Top Stories' }}
+        options={{ title: 'News' }}
       />
       <Stack.Screen
         name="ArticleDetail"
