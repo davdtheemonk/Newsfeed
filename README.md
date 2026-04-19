@@ -130,7 +130,7 @@ Base URL: `https://hacker-news.firebaseio.com/v0`
 | `GET /topstories.json` | Returns array of story IDs  |
 | `GET /item/{id}.json`  | Returns single story object |
 
-Fetches the first 20 IDs then retrieves each item in parallel via `Promise.all`. Filters to items where `type === 'story'` and a `url` exists.
+API integration using the above provided Hacker News endpoints
 
 ---
 
