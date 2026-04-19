@@ -59,19 +59,13 @@ npm install
 cd ios && pod install && cd ..
 ```
 
-**4. Start Metro bundler**
-
-```bash
-npx react-native start
-```
-
-**5. Run on Android**
+**4. Run on Android**
 
 ```bash
 npx react-native run-android
 ```
 
-**6. Run on iOS (macOS only)**
+**4. Run on iOS (macOS only)**
 
 ```bash
 npx react-native run-ios
