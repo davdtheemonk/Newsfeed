@@ -185,7 +185,7 @@ export default function ArticleListScreen() {
     </>
   );
 
-  // Loading state — only on first load, not on refresh
+  // Loading state
   if (status === 'loading' && sortedArticles.length === 0) {
     return (
       <View style={styles.center}>

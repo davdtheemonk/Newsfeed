@@ -86,14 +86,14 @@ npx react-native run-ios
 - [x] Article list with FlatList — `keyExtractor`, `getItemLayout`, `React.memo`
 - [x] Pull-to-refresh via `RefreshControl`
 - [x] Loading, error, and empty states
-- [x] Sort toggle — by score or by time, survives navigation
+- [x] Sort toggle, by score and by time
 - [x] Scroll position restored when navigating back from detail
 - [x] Article detail with tappable URL via `Linking.openURL`
 - [x] Share button in header using `Share API`
-- [x] Bookmark toggle persisted across cold restarts via AsyncStorage
-- [x] TypeScript throughout — no unexplained `any`
-- [x] Unit test — `relativeTime()` (Jest)
-- [x] Component interaction test — `ArticleCard` press (RNTL)
+- [x] Bookmarks persist across cold restarts via AsyncStorage
+- [x] TypeScript throughout, no unexplained `any`
+- [x] Unit test
+- [x] Component interaction test — `ArticleCard`
 
 ### Bonus Features I implemented
 
