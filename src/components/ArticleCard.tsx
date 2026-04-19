@@ -1,9 +1,9 @@
 // src/features/articles/ArticleCard.tsx
 import React, { memo, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import type { Article } from '../../types/Article';
-import { parseDomain } from '../../utils/domain';
-import { relativeTime } from '../../utils/time';
+import type { Article } from '../types/Article';
+import { parseDomain } from '../utils/domain';
+import { relativeTime } from '../utils/time';
 
 interface Props {
   article: Article;

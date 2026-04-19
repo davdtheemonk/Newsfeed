@@ -9,10 +9,10 @@ import {
   ScrollView,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../../types/Navigation';
-import { useBookmark } from '../../hooks/useBookmarks';
-import { parseDomain } from '../../utils/domain';
-import { relativeTime } from '../../utils/time';
+import type { RootStackParamList } from '../types/Navigation';
+import { useBookmark } from '../hooks/useBookmarks';
+import { parseDomain } from '../utils/domain';
+import { relativeTime } from '../utils/time';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ArticleDetail'>;
 

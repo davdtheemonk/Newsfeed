@@ -13,16 +13,16 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAppDispatch, useAppSelector } from '../../store';
+import { useAppDispatch, useAppSelector } from '../store';
 import {
   fetchArticles,
   setSortBy,
   selectSortedArticles,
-} from '../../store/articlesSlice';
-import type { Article } from '../../types/Article';
-import type { RootStackParamList } from '../../types/Navigation';
-import ArticleCard from '../articles/ArticleCard';
-import { useDebounce } from '../../hooks/useDebounce';
+} from '../store/articlesSlice';
+import type { Article } from '../types/Article';
+import type { RootStackParamList } from '../types/Navigation';
+import ArticleCard from '../components/ArticleCard';
+import { useDebounce } from '../hooks/useDebounce';
 
 const CARD_HEIGHT = 100;
 type Nav = NativeStackNavigationProp<RootStackParamList, 'ArticleList'>;

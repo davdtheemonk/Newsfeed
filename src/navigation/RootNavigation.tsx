@@ -2,9 +2,9 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { RootStackParamList, TabParamList } from '../types/Navigation';
-import ArticleListScreen from '../features/articles/ArticleListScreen';
-import ArticleDetailScreen from '../features/details/ArticleDetailScreen';
-import BookmarksScreen from '../features/bookmarks/BookmarksScreen';
+import ArticleListScreen from '../screens/ArticleListScreen';
+import ArticleDetailScreen from '../screens/ArticleDetailScreen';
+import BookmarksScreen from '../screens/BookmarksScreen';
 import { Text } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

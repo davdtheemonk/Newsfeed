@@ -8,17 +8,17 @@ import {
   TouchableOpacity,
   PanResponder,
 } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../../store';
+import { useAppDispatch, useAppSelector } from '../store';
 
 import {
   removeBookmark,
   selectAllBookmarkedArticles,
-} from '../../store/bookmarkSlice';
-import type { Article } from '../../types/Article';
-import ArticleCard from '../articles/ArticleCard';
+} from '../store/bookmarkSlice';
+import type { Article } from '../types/Article';
+import ArticleCard from '../components/ArticleCard';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { TabParamList } from '../../types/Navigation';
+import type { TabParamList } from '../types/Navigation';
 
 type Nav = BottomTabNavigationProp<TabParamList>;
 

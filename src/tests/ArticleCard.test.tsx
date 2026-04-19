@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import ArticleCard from '../features/articles/ArticleCard';
+import ArticleCard from '../components/ArticleCard';
 import type { Article } from '../types/Article';
 
 const mockArticle: Article = {
