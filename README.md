@@ -87,7 +87,6 @@ npx react-native run-ios
 - [x] Pull-to-refresh via `RefreshControl`
 - [x] Loading, error, and empty states
 - [x] Sort toggle, by score and by time
-- [x] Scroll position restored when navigating back from detail
 - [x] Article detail with tappable URL via `Linking.openURL`
 - [x] Share button in header using `Share API`
 - [x] Bookmarks persist across cold restarts via AsyncStorage
