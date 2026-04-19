@@ -12,23 +12,6 @@ A React Native news feed application built with TypeScript, Redux Toolkit, and R
 
 ---
 
-## Tech Stack
-
-| Library                      | Version  | Purpose                       |
-| ---------------------------- | -------- | ----------------------------- |
-| React Native                 | 0.85     | Core framework                |
-| TypeScript                   | 5.x      | Type safety throughout        |
-| Redux Toolkit                | latest   | State management              |
-| React Redux                  | latest   | React bindings                |
-| React Navigation             | v6       | Stack + bottom tab navigation |
-| AsyncStorage                 | latest   | Bookmark persistence          |
-| NetInfo                      | latest   | Offline detection             |
-| React Native Gesture Handler | latest   | Swipe to delete               |
-| Testing Library              | latest   | Component interaction tests   |
-| Jest                         | built-in | Unit tests                    |
-
----
-
 ## Getting Started
 
 ### Prerequisites
