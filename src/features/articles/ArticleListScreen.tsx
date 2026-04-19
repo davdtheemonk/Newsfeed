@@ -104,33 +104,26 @@ export default function ArticleListScreen() {
     [handleCardPress],
   );
 
-  // Loading state — only on first load, not on refresh
-  if (status === 'loading' && sortedArticles.length === 0) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#E65100" />
-        <Text style={styles.loadingText}>Loading stories…</Text>
-      </View>
-    );
-  }
+  const renderHeader = useCallback(() => {
+    // Empty search state header
+    if (filtered.length === 0 && debouncedQuery.trim() !== '') {
+      return (
+        <View style={styles.center}>
+          <Text style={styles.emptyIcon}>🔍</Text>
+          <Text style={styles.emptyText}>
+            No results for "{debouncedQuery}"
+          </Text>
+          <TouchableOpacity onPress={() => setQuery('')}>
+            <Text style={styles.clearSearch}>Clear search</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return null;
+  }, [filtered.length, debouncedQuery]);
 
-  if (status === 'error') {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorIcon}>⚠</Text>
-        <Text style={styles.errorText}>{error ?? 'Something went wrong.'}</Text>
-        <TouchableOpacity
-          style={styles.retryButton}
-          onPress={() => dispatch(fetchArticles())}
-        >
-          <Text style={styles.retryText}>Try again</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
+  const ListHeaderComponent = (
+    <>
       {/* Search bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
@@ -142,11 +135,10 @@ export default function ArticleListScreen() {
             value={query}
             onChangeText={setQuery}
             returnKeyType="search"
-            clearButtonMode="while-editing" // iOS only
+            clearButtonMode="while-editing"
             autoCorrect={false}
             autoCapitalize="none"
           />
-          {/* Android clear button */}
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery('')}>
               <Text style={styles.clearBtn}>✕</Text>
@@ -184,35 +176,48 @@ export default function ArticleListScreen() {
           </Text>
         </TouchableOpacity>
 
-        {/* Result count — updates as user types */}
         {debouncedQuery.trim() !== '' && (
           <Text style={styles.resultCount}>
             {filtered.length} result{filtered.length !== 1 ? 's' : ''}
           </Text>
         )}
       </View>
+    </>
+  );
 
-      {/* Empty search state */}
-      {filtered.length === 0 && debouncedQuery.trim() !== '' ? (
-        <View style={styles.center}>
-          <Text style={styles.emptyIcon}>🔍</Text>
-          <Text style={styles.emptyText}>
-            No results for "{debouncedQuery}"
-          </Text>
-          <TouchableOpacity onPress={() => setQuery('')}>
-            <Text style={styles.clearSearch}>Clear search</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
+  // Loading state — only on first load, not on refresh
+  if (status === 'loading' && sortedArticles.length === 0) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#E65100" />
+        <Text style={styles.loadingText}>Loading stories…</Text>
+      </View>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorIcon}>⚠</Text>
+        <Text style={styles.errorText}>{error ?? 'Something went wrong.'}</Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={() => dispatch(fetchArticles())}
+        >
+          <Text style={styles.retryText}>Try again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Empty search state without results
+  if (filtered.length === 0 && debouncedQuery.trim() !== '') {
+    return (
+      <View style={styles.container}>
         <FlatList
-          ref={listRef}
-          data={filtered}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          getItemLayout={getItemLayout}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={styles.list}
+          ListHeaderComponent={ListHeaderComponent}
+          data={[]}
+          renderItem={() => null}
           refreshControl={
             <RefreshControl
               refreshing={status === 'loading'}
@@ -220,18 +225,42 @@ export default function ArticleListScreen() {
               tintColor="#E65100"
             />
           }
-          // Dismiss keyboard when scrolling
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.list}
         />
-      )}
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        ref={listRef}
+        data={filtered}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        getItemLayout={getItemLayout}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={styles.list}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={status === 'loading'}
+            onRefresh={handleRefresh}
+            tintColor="#E65100"
+          />
+        }
+        ListHeaderComponent={ListHeaderComponent}
+        ListEmptyComponent={renderHeader}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
-  list: { paddingVertical: 8 },
+  list: { paddingBottom: 8 },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -278,7 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: '#1a1a1a',
-    paddingVertical: 0, // removes Android default padding
+    paddingVertical: 0,
   },
   clearBtn: { fontSize: 14, color: '#aaa', paddingLeft: 8 },
 
