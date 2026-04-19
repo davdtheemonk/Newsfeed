@@ -23,16 +23,13 @@ export default function ArticleDetailScreen({ route, navigation }: Props) {
   const handleShare = useCallback(async () => {
     try {
       await Share.share({ message: `${article.title}\n\n${article.url}` });
-    } catch {
-      // User cancelled or share failed — no action needed
-    }
+    } catch {}
   }, [article]);
 
   const handleOpenURL = useCallback(async () => {
     await Linking.openURL(article.url);
   }, [article.url]);
 
-  // Set header buttons — must be inside useLayoutEffect to render before the screen mounts
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (

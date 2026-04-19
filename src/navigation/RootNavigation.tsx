@@ -27,8 +27,6 @@ function ArticleStack() {
   );
 }
 
-// Remove the Tab navigator below if not doing the bonus Bookmarks tab
-
 export default function RootNavigator() {
   return (
     <Tab.Navigator

@@ -1,4 +1,3 @@
-// src/features/articles/ArticleListScreen.tsx
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
@@ -35,7 +34,6 @@ export default function ArticleListScreen() {
   const { status, error, sortBy } = useAppSelector(state => state.articles);
   const sortedArticles = useAppSelector(selectSortedArticles);
 
-  // Search state — local only, no API calls
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 
@@ -51,7 +49,6 @@ export default function ArticleListScreen() {
             article.by.toLowerCase().includes(debouncedQuery.toLowerCase()),
         );
 
-  // Scroll position restoration
   const listRef = useRef<FlatList<Article>>(null);
   const scrollOffset = useRef(0);
 

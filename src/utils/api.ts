@@ -18,6 +18,6 @@ async function fetchItem(id: number): Promise<Article> {
 export async function fetchTopStories(): Promise<Article[]> {
   const ids = await fetchTopIds();
   const items = await Promise.all(ids.map(fetchItem));
-  // Filter: must be a story with a url
+
   return items.filter(item => item.type === 'story' && Boolean(item.url));
 }

@@ -1,12 +1,14 @@
-// App.tsx
-import 'react-native-gesture-handler'; // must be first import
+import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from './src/store';
+import OfflineBanner from './src/components/OfflineBanner';
+
 import RootNavigator from './src/navigation/RootNavigation';
+import { StyleSheet, View } from 'react-native';
 
 export default function App() {
   return (
@@ -14,10 +16,17 @@ export default function App() {
       <Provider store={store}>
         <SafeAreaProvider>
           <NavigationContainer>
-            <RootNavigator />
+            <View style={styles.root}>
+              <OfflineBanner />
+              <RootNavigator />
+            </View>
           </NavigationContainer>
         </SafeAreaProvider>
       </Provider>
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+});

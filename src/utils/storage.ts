@@ -14,7 +14,5 @@ export async function loadBookmarks(): Promise<number[]> {
 export async function saveBookmarks(ids: number[]): Promise<void> {
   try {
     await AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(ids));
-  } catch {
-    // Silently fail — bookmarks are convenience, not critical data
-  }
+  } catch {}
 }

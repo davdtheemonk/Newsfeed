@@ -1,4 +1,3 @@
-// src/features/articles/ArticleCard.tsx
 import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import type { Article } from '../../types/Article';
@@ -28,7 +27,6 @@ const ArticleCard = memo(({ article, onPress }: Props) => {
         <Image
           source={{ uri: `${FAVICON_BASE}${domain}` }}
           style={styles.favicon}
-          // Graceful fallback — if favicon fails, nothing crashes
         />
         <View style={styles.meta}>
           <Text style={styles.domain} numberOfLines={1}>
