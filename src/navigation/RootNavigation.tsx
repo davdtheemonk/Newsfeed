@@ -43,11 +43,9 @@ export default function RootNavigator() {
         },
         tabBarIcon: ({ focused }) => {
           if (route.name === 'Feed') {
-            return (
-              <Text style={{ fontSize: 20 }}>{focused ? '📰' : '🗞️'}</Text>
-            );
+            return <Text style={{ fontSize: 20 }}>🗞️</Text>;
           }
-          return <Text style={{ fontSize: 20 }}>{focused ? '🔖' : '📑'}</Text>;
+          return <Text style={{ fontSize: 20 }}> 📑</Text>;
         },
       })}
     >
